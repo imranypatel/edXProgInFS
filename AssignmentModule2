@@ -1,0 +1,29 @@
+open System
+
+let checkAge age =
+    if age >= 20 then "no longer teenager"
+    elif age >13 then "teenager"
+    else "kid or child"
+
+[<EntryPoint>]   
+let main argv = 
+    let mutable more = true
+    while more do
+        // Read name
+        Console.WriteLine("Please enter the name")
+        let name = Console.ReadLine()
+
+        // Read name
+        Console.WriteLine("Please enter the age")
+        let age = Console.ReadLine()
+        let age = int age
+
+        // check age and display result
+        printfn "%s is %s" name (checkAge age) 
+
+        // Read to check more
+        Console.WriteLine("Please enter Y to check more?")
+        let checkMore = Console.ReadLine().ToUpper()
+        more <- if checkMore = "Y" then true else false
+
+    0 // return an integer exit code
