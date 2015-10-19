@@ -1,0 +1,42 @@
+
+let rec enterInt msg =
+    printf "%s" msg
+    match Int32.TryParse(Console.ReadLine()) with
+    | true, num -> num
+    | _ ->
+        eprintfn "Please enter an integer number..."
+        enterInt msg
+
+let rec enterFloat (msg:string) =
+    printf "%s" msg
+    match Double.TryParse(Console.ReadLine()) with
+    | true, num -> num
+    | _ ->
+        eprintfn "Please enter an float number..."
+        enterFloat msg
+
+let GoldenRatio = (1.0 + sqrt 5.0) / 2.0
+
+[<EntryPoint>]
+let main (argv:string []) =
+    
+    let count = enterInt "Total numbers to be entered? "
+       
+    let nums = 
+         [ for i = 1 to count do
+              let msg  =  sprintf "Enter float number %i? " i
+              yield enterFloat msg ]
+
+    let results = 
+         seq {
+                for x in nums do
+                    yield (x, x * GoldenRatio )
+            }
+    
+    
+    printfn "Numbers with Products:"
+    for t in results
+        do  printfn "%A" t
+
+    0
+
