@@ -7,7 +7,7 @@ let rec enterInt msg =
         eprintfn "Please enter an integer number..."
         enterInt msg
 
-let rec enterFloat (msg:string) =
+let rec enterFloat msg =
     printf "%s" msg
     match Double.TryParse(Console.ReadLine()) with
     | true, num -> num
