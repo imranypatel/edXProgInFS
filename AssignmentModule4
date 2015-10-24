@@ -1,0 +1,89 @@
+open System
+open System.IO
+
+type Gun =
+    { X : float
+      Y : float
+      Speed : float
+      ExpectedDistance : float
+      Name : string
+      }
+type Result =
+    {
+      Gun : Gun
+      Theta : float
+      DistanceTravelled : float
+      HitExpectedDistance : bool
+      AngleOfReach : float
+      }
+
+let Gravity = 9.8
+
+let calcAngleOfReach distance speed =  
+    (1./2.) * Math.Asin( (Gravity * distance) / (speed ** 2.))
+
+let calcDistanceTravelled speed theta =
+    ((speed ** 2.) * Math.Sin(2.* theta)) / Gravity
+
+let calcAngle x y =
+    Math.Atan(y/x)
+
+let (|Hit|Missed|) (target, actual) = 
+    if abs(target - actual) <= 0.5 then Hit else Missed
+
+let GetFilePath() =
+    Console.Write("Enter the full path to the name of the input file: ")
+    Console.ReadLine()
+
+
+[<EntryPoint>]    
+let main (argv:string []) =
+    try
+        use input =
+            new StreamReader(match argv.Length with
+                             | 0 -> GetFilePath()    
+                             | _ -> argv.[0])    
+
+        let inputList =
+            [ while not input.EndOfStream do
+                  let raw = input.ReadLine()
+                  let values = raw.Split(',')
+                  yield { X = float values.[0]
+                          Y = float values.[1]
+                          Speed = float values.[2]
+                          ExpectedDistance = float values.[3]
+                          Name = values.[4]
+                          } ]
+
+        // calc
+        let resultList =
+          [
+            for g in inputList do
+                let theta = calcAngle g.X g.Y
+                let distTravelled = calcDistanceTravelled g.Speed theta
+                let angleOfReach = calcAngleOfReach distTravelled g.Speed
+                yield { Gun = g
+                        Theta = theta
+                        DistanceTravelled = distTravelled                       
+                        HitExpectedDistance = match  (g.ExpectedDistance, distTravelled) with
+                                              | Hit -> true
+                                              | _ -> false
+                        AngleOfReach = angleOfReach
+                        }
+          ]          
+
+        Console.WriteLine("Guns summary: ")
+        for g in resultList do
+           printfn "%A" g
+
+        Console.ReadKey()
+        0
+    with
+    | :? System.IO.FileNotFoundException ->
+        Console.Write("File Not Found. Press a key to exit")
+        Console.ReadKey()
+        -1
+    | _ ->
+        Console.Write("Something else happened")
+        Console.ReadKey()
+        -1
